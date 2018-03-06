@@ -16,4 +16,4 @@ functions:
     events:
         - http:
             path: /random
-            method: get
+            method: post

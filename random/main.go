@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -10,6 +11,33 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
+
+func main() {
+	rand.Seed(time.Now().UnixNano())
+
+	lambda.Start(Handler)
+}
+
+func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	values, _ := url.ParseQuery(request.Body)
+
+	parameters := make(map[string]string)
+	for key := range values {
+		parameters[key] = values[key][0]
+	}
+
+	if r, err := generateRandomInteger(parameters); err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       err.Error(),
+			StatusCode: 400,
+		}, nil
+	} else {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf(`{"text": "Your random number is: **%d**","response_type": "in_channel"}`, r),
+			StatusCode: 200,
+		}, nil
+	}
+}
 
 func generateRandomInteger(queryStringParameters map[string]string) (int, error) {
 	parameters := strings.Split(strings.Trim(queryStringParameters["text"], " "), " ")
@@ -42,24 +70,4 @@ func generateRandomInteger(queryStringParameters map[string]string) (int, error)
 	} else {
 		return 0, fmt.Errorf("Unexpected # of parameters: %d", len(parameters))
 	}
-}
-
-func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if r, err := generateRandomInteger(request.QueryStringParameters); err != nil {
-		return events.APIGatewayProxyResponse{
-			Body:       err.Error(),
-			StatusCode: 400,
-		}, nil
-	} else {
-		return events.APIGatewayProxyResponse{
-			Body:       strconv.Itoa(r),
-			StatusCode: 200,
-		}, nil
-	}
-}
-
-func main() {
-	rand.Seed(time.Now().UnixNano())
-
-	lambda.Start(Handler)
 }
