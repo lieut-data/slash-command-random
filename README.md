@@ -11,6 +11,8 @@ slash commands.
 See [Getting Started with Serverless](https://serverless.com/framework/docs/getting-started/) for
 instructions on how to deploy this function to the compute provider of your choice.
 
+This repository is configured to use AWS Lambda, but feel free to modify for your own purposes.
+
 ### Compiling
 
 Simply invoke `make` to generate the requisite binaries:
@@ -35,7 +37,10 @@ The API returns a random integer between 0 and 100, inclusive.
 
 ## Single integer parameter
 
-The API returns a random integer between 0 and the given integer, inclusive
+The API returns a random integer between 0 and the given integer, inclusive.
+
+Note that the associated tech talk video incorrectly suggested in the autocomplete help text that 
+this was a minimum, not a maximum. 
 
 ## Single string parameter: `die` or `dice`
 
